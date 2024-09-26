@@ -6,17 +6,17 @@
 int factorial(int);
 int binomial(int, int);
 int poweroftwo(int);
+void initialize(int ***);
+void display(int ***);
 
 int main(void) {
   int ***powerset = NULL;
+
   int i = 0;
   int j = 0;
-  int k = 0;
-  int l = 0;
-  int m = 0;
   int p = 0;
 
-  for (i = 0; i <= N; ++i) {
+  for (i = 0; i <= N; ++i) { /*{{{*/
     p += sizeof(malloc(binomial(N, i) *
                        sizeof(malloc(((i == 0) ? 1 : i) * sizeof(int)))));
   }
@@ -29,7 +29,44 @@ int main(void) {
     for (j = 0; j < p; ++j) {
       powerset[i][j] = malloc(i * sizeof(int));
     }
+  } /*}}}*/
+
+  initialize(powerset);
+
+  display(powerset);
+
+  free(powerset);
+
+  exit(EXIT_SUCCESS);
+}
+
+int factorial(int n) { /*{{{*/
+  int f;
+  for (f = 1; n > 0; --n) {
+    f *= n;
   }
+  return f;
+} /*}}}*/
+
+int binomial(int n, int p) { /*{{{*/
+  return (n >= p) ? factorial(n) / (factorial(n - p) * factorial(p)) : 0;
+} /*}}}*/
+
+int poweroftwo(int n) { /*{{{*/
+  int p;
+  for (p = 1; n > 0; --n) {
+    p *= 2;
+  }
+  return p;
+} /*}}}*/
+
+void initialize(int ***powerset) { /*{{{*/
+  int i = 0;
+  int j = 0;
+  int k = 0;
+  int l = 0;
+  int m = 0;
+  int p = 0;
 
   powerset[0][0][0] = '*';
 
@@ -57,6 +94,13 @@ int main(void) {
   for (i = 0; i < N; ++i) {
     powerset[N][0][i] = i;
   }
+} /*}}}*/
+
+void display(int ***powerset) { /*{{{*/
+  int i = 0;
+  int j = 0;
+  int k = 0;
+  int p = 0;
 
   printf("\n0: *\n");
 
@@ -81,27 +125,4 @@ int main(void) {
     }
   }
 
-  free(powerset);
-
-  exit(EXIT_SUCCESS);
-}
-
-int factorial(int n) { /*{{{*/
-  int f;
-  for (f = 1; n > 0; --n) {
-    f *= n;
-  }
-  return f;
-} /*}}}*/
-
-int binomial(int n, int p) { /*{{{*/
-  return (n >= p) ? factorial(n) / (factorial(n - p) * factorial(p)) : 0;
-} /*}}}*/
-
-int poweroftwo(int n) { /*{{{*/
-  int p;
-  for (p = 1; n > 0; --n) {
-    p *= 2;
-  }
-  return p;
 } /*}}}*/

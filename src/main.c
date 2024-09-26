@@ -1,35 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 6
+#define N 4
 
 int factorial(int);
 int binomial(int, int);
 int poweroftwo(int);
+void allocate(int ****);
 void initialize(int ***);
 void display(int ***);
 
 int main(void) {
   int ***powerset = NULL;
 
-  int i = 0;
-  int j = 0;
-  int p = 0;
-
-  for (i = 0; i <= N; ++i) { /*{{{*/
-    p += sizeof(malloc(binomial(N, i) *
-                       sizeof(malloc(((i == 0) ? 1 : i) * sizeof(int)))));
-  }
-
-  powerset = malloc(p);
-
-  for (i = 0; i <= N; ++i) {
-    powerset[i] = malloc(binomial(N, i) * sizeof(malloc(i * sizeof(int))));
-    p = binomial(N, i);
-    for (j = 0; j < p; ++j) {
-      powerset[i][j] = malloc(i * sizeof(int));
-    }
-  } /*}}}*/
+  allocate(&powerset);
 
   initialize(powerset);
 
@@ -58,6 +42,27 @@ int poweroftwo(int n) { /*{{{*/
     p *= 2;
   }
   return p;
+} /*}}}*/
+
+void allocate(int ****powerset) { /*{{{*/
+  int i = 0;
+  int j = 0;
+  int p = 0;
+
+  for (i = 0; i <= N; ++i) {
+    p += sizeof(malloc(binomial(N, i) *
+                       sizeof(malloc(((i == 0) ? 1 : i) * sizeof(int)))));
+  }
+
+  *powerset = malloc(p);
+
+  for (i = 0; i <= N; ++i) {
+    (*powerset)[i] = malloc(binomial(N, i) * sizeof(malloc(i * sizeof(int))));
+    p = binomial(N, i);
+    for (j = 0; j < p; ++j) {
+      (*powerset)[i][j] = malloc(i * sizeof(int));
+    }
+  }
 } /*}}}*/
 
 void initialize(int ***powerset) { /*{{{*/

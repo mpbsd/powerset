@@ -5,7 +5,10 @@ CLIBS  = -lc
 build:
 	$(CC) $(CFLAGS) $(CLIBS) src/main.c -o bin/main.o && ./bin/main.o
 
+chase:
+	valgrind --leak-check=full --show-leak-kinds=all ./bin/main.o
+
 clean:
 	find bin -type f -name "*.o" -delete
 
-.PHONY: build clean
+.PHONY: build chase clean

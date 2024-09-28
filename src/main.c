@@ -13,12 +13,23 @@ void display(int ***);
 
 int main(void) {
   int ***powerset = NULL;
+  int i = 0;
+  int j = 0;
+  int b = 0;
 
   allocate(&powerset);
 
   initialize(powerset);
 
   display(powerset);
+
+  for (i = 0; i <= N; ++i) {
+    b = binomial(N, i);
+    for (j = 0; j < b; ++j) {
+      free(powerset[i][j]);
+    }
+    free(powerset[i]);
+  }
 
   free(powerset);
 

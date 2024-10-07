@@ -1,21 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 4
+#define N 5
 
 int factorial(int);
 int binomial(int, int);
 int poweroftwo(int);
 void allocate(int ****);
+void setfree(int ****);
 void initialize(int ***);
 void elements(int ***, int, int);
 void display(int ***);
 
 int main(void) {
   int ***powerset = NULL;
-  int i = 0;
-  int j = 0;
-  int b = 0;
 
   allocate(&powerset);
 
@@ -23,15 +21,7 @@ int main(void) {
 
   display(powerset);
 
-  for (i = 0; i <= N; ++i) {
-    b = binomial(N, i);
-    for (j = 0; j < b; ++j) {
-      free(powerset[i][j]);
-    }
-    free(powerset[i]);
-  }
-
-  free(powerset);
+  setfree(&powerset);
 
   exit(EXIT_SUCCESS);
 }
@@ -77,6 +67,22 @@ void allocate(int ****powerset) { /*{{{*/
   }
 } /*}}}*/
 
+void setfree(int ****powerset) { /*{{{*/
+  int i = 0;
+  int j = 0;
+  int b = 0;
+
+  for (i = 0; i <= N; ++i) {
+    b = binomial(N, i);
+    for (j = 0; j < b; ++j) {
+      free((*powerset)[i][j]);
+    }
+    free((*powerset)[i]);
+  }
+
+  free((*powerset));
+} /*}}}*/
+
 void initialize(int ***powerset) { /*{{{*/
   int i = 0;
   int j = 0;
@@ -115,7 +121,7 @@ void elements(int ***powerset, int i, int j) { /*{{{*/
   int k = 0;
 
   if (i == 0) {
-    printf("*");
+    printf("{}");
   } else {
     for (k = 0; k < i; ++k) {
       printf("%s%d", (k == 0) ? "{" : ", ", powerset[i][j][k]);
@@ -139,4 +145,6 @@ void display(int ***powerset) { /*{{{*/
       printf("%s", (j < p - 1) ? ", " : "\n");
     }
   }
+
+  printf("\n");
 } /*}}}*/

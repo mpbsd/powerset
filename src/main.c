@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 5
+#define N 3
 
 int factorial(int);
 int binomial(int, int);
@@ -16,11 +16,8 @@ int main(void) {
   int ***powerset = NULL;
 
   allocate(&powerset);
-
   initialize(powerset);
-
   display(powerset);
-
   setfree(&powerset);
 
   exit(EXIT_SUCCESS);
@@ -145,6 +142,4 @@ void display(int ***powerset) { /*{{{*/
       printf("%s", (j < p - 1) ? ", " : "\n");
     }
   }
-
-  printf("\n");
 } /*}}}*/

@@ -56,7 +56,8 @@ void allocate(int ****powerset) { /*{{{*/
   *powerset = malloc(p);
 
   for (i = 0; i <= N; ++i) {
-    (*powerset)[i] = malloc(binomial(N, i) * sizeof(malloc(i * sizeof(int))));
+    (*powerset)[i] =
+        malloc(binomial(N, i) * sizeof(malloc(((i == 0) ? 1 : i) * sizeof(int))));
     p = binomial(N, i);
     for (j = 0; j < p; ++j) {
       (*powerset)[i][j] = malloc(i * sizeof(int));

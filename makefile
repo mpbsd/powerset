@@ -1,11 +1,11 @@
 CC     = cc
-CFLAGS = -g -W -Wall -Wextra -Wpedantic -std=c89
+CFLAGS = -g -W -Wall -Werror -Wextra -Wpedantic -std=c89
 CLIBS  = -lc
 
-build:
+build: src/main.c
 	$(CC) $(CFLAGS) $(CLIBS) src/main.c -o bin/main.o && ./bin/main.o
 
-chase:
+chase: bin/main.o
 	valgrind -s --leak-check=full --show-leak-kinds=all ./bin/main.o
 
 clean:

@@ -1,148 +1,128 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define N 5
+int factorial(int n);
+int binomial(int n, int k);
+void allocate(int**** powerset, int n);
+void deallocate(int**** powerset, int n);
+void initialize(int**** powerset, int n);
+void prettyprint(int**** powerset, int n);
 
-int factorial(int);
-int binomial(int, int);
-int poweroftwo(int);
-void allocate(int ****);
-void setfree(int ****);
-void initialize(int ***);
-void elements(int ***, int, int);
-void display(int ***);
+int main(int argc, char** argv) {
+  if (argc == 3 && !strcmp(argv[1], "-n")) {
+    int*** powerset = NULL;
+    int n = atoi(argv[2]);
 
-int main(void) {
-  int ***powerset = NULL;
+    allocate(&powerset, n);
+    initialize(&powerset, n);
+    prettyprint(&powerset, n);
+    deallocate(&powerset, n);
 
-  allocate(&powerset);
-  initialize(powerset);
-  display(powerset);
-  setfree(&powerset);
-
-  exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
+  } else {
+    printf("wrong usage.\n");
+    exit(EXIT_FAILURE);
+  }
 }
 
-int factorial(int n) { /*{{{*/
-  int f;
-  for (f = 1; n > 0; --n) {
-    f *= n;
+int factorial(int n)
+{
+  int f = 1;
+
+  while (n > 1) {
+    f *= n--;
   }
+
   return f;
-} /*}}}*/
+}
 
-int binomial(int n, int p) { /*{{{*/
-  return (n >= p) ? factorial(n) / (factorial(n - p) * factorial(p)) : 0;
-} /*}}}*/
+int binomial(int n, int k)
+{
+  return (n >= k) ? factorial(n) / (factorial(k) * factorial(n - k)) : 0;
+}
 
-int poweroftwo(int n) { /*{{{*/
-  int p;
-  for (p = 1; n > 0; --n) {
-    p *= 2;
-  }
-  return p;
-} /*}}}*/
+void allocate(int**** powerset, int n)
+{
+  int i;
+  int j;
+  int b;
 
-void allocate(int ****powerset) { /*{{{*/
-  int i = 0;
-  int j = 0;
-  int p = 0;
+  (*powerset) = malloc((n + 1) * sizeof(int***));
 
-  for (i = 0; i <= N; ++i) {
-    p += sizeof(malloc(binomial(N, i) *
-                       sizeof(malloc(((i == 0) ? 1 : i) * sizeof(int)))));
-  }
-
-  *powerset = malloc(p);
-
-  for (i = 0; i <= N; ++i) {
-    (*powerset)[i] = malloc(binomial(N, i) *
-                            sizeof(malloc(((i == 0) ? 1 : i) * sizeof(int))));
-    p = binomial(N, i);
-    for (j = 0; j < p; ++j) {
-      (*powerset)[i][j] = malloc(((i == 0) ? 1 : i) * sizeof(int));
+  for (i = 0; i <= n; ++i) {
+    b = binomial(n, i);
+    (*powerset)[i] = malloc(b * sizeof(int**));
+    for (j = 0; j < b; ++j) {
+      (*powerset)[i][j] = malloc(((i > 0) ? i : 1) * sizeof(int*));
     }
   }
-} /*}}}*/
+}
 
-void setfree(int ****powerset) { /*{{{*/
-  int i = 0;
-  int j = 0;
-  int b = 0;
+void deallocate(int**** powerset, int n)
+{
+  int i;
+  int j;
+  int b;
 
-  for (i = 0; i <= N; ++i) {
-    b = binomial(N, i);
+  for (i = 0; i <= n; ++i) {
+    b = binomial(n, i);
     for (j = 0; j < b; ++j) {
       free((*powerset)[i][j]);
     }
     free((*powerset)[i]);
   }
 
-  free((*powerset));
-} /*}}}*/
+  free(*powerset);
+}
 
-void initialize(int ***powerset) { /*{{{*/
-  int i = 0;
-  int j = 0;
-  int k = 0;
-  int l = 0;
-  int m = 0;
-  int p = 0;
+void initialize(int**** powerset, int n)
+{
+  int i;
+  int j;
+  int k;
+  int l;
+  int m;
+  int b;
 
-  powerset[0][0][0] = '*';
+  (*powerset)[0][0][0] = '*';
 
-  for (j = 0; j < N; ++j) {
-    powerset[1][j][0] = j;
+  for (i = 0; i < n; ++i) {
+    (*powerset)[1][i][0] = i;
+    (*powerset)[n][0][i] = i;
   }
 
-  for (i = 2; i < N; ++i) {
-    p = binomial(N, i - 1);
-    j = 0;
-    for (k = 0; k < p; ++k) {
-      if (powerset[i - 1][k][i - 2] < N - 1) {
-        for (l = powerset[i - 1][k][i - 2] + 1; l < N; ++l) {
-          for (m = 0; m < i - 1; ++m) {
-            powerset[i][j][m] = powerset[i - 1][k][m];
+  for (i = 2; i <= n - 1; ++i) {
+    b = binomial(n, i - 1);
+    for (j = 0, k = 0; j <= b - 1; ++j) {
+      if ((*powerset)[i - 1][j][i - 2] <= n - 2) {
+        for (l = (*powerset)[i - 1][j][i - 2] + 1; l <= n - 1; ++k, ++l) {
+          for (m = 0; m <= i - 1; ++m) {
+            (*powerset)[i][k][m] = (m <= i - 2) ? (*powerset)[i - 1][j][m] : l;
           }
-          powerset[i][j++][i - 1] = l;
         }
       }
     }
   }
+}
 
-  for (i = 0; i < N; ++i) {
-    powerset[N][0][i] = i;
-  }
-} /*}}}*/
+void prettyprint(int**** powerset, int n)
+{
+  int i;
+  int j;
+  int k;
+  int b;
 
-void elements(int ***powerset, int i, int j) { /*{{{*/
-  int k = 0;
-
-  if (i == 0) {
-    printf("{}");
-  } else {
-    for (k = 0; k < i; ++k) {
-      printf("%s%d", (k == 0) ? "{" : ", ", powerset[i][j][k]);
-    }
-    printf("}");
-  }
-} /*}}}*/
-
-void display(int ***powerset) { /*{{{*/
-  int i = 0;
-  int j = 0;
-  int p = 0;
-
-  printf("\n");
-
-  for (i = 0; i <= N; ++i) {
+  for (i = 0; i <= n; ++i) {
     printf("%d: ", i);
-    p = binomial(N, i);
-    for (j = 0; j < p; ++j) {
-      elements(powerset, i, j);
-      printf("%s", (j < p - 1) ? ", " : "\n");
+    b = binomial(n, i);
+    for (j = 0; j < b; ++j) {
+      printf(" {");
+      for (k = 0; k < i; ++k) {
+        printf(" %d ", (*powerset)[i][j][k]);
+      }
+      printf("} ");
     }
+    printf("\n");
   }
-
-  printf("\n");
-} /*}}}*/
+}
